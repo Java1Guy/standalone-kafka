@@ -6,7 +6,7 @@ We run kafka(0.8.2) in container and make it super easy to develop, test and ben
 
 It's painless and everyone can setup kafka environment within seconds!
 
-![](kafka.png)
+![](kafka_docker.png)
 
 ## Usage
 
