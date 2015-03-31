@@ -2,7 +2,7 @@
 
 ## Introduction
 
-We run kafka in container and make it super easy to develop, test and benchmark.
+We run kafka(0.8.2) in container and make it super easy to develop, test and benchmark.
 
 It's painless and everyone can setup kafka environment within seconds!
 
@@ -18,7 +18,7 @@ It exposes 2181 for ZooKeeper and 9092 for Kafka. Just connect with them like lo
 
 ## Tutorial
 
-You can run all the commands from [kafka docuemnts](http://kafka.apache.org/documentation.html).
+You can run all the commands from [kafka documents](http://kafka.apache.org/documentation.html).
 
 ```
 ➜ cd kafka
