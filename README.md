@@ -11,7 +11,7 @@ It's painless and everyone can setup kafka environment within seconds!
 ## Usage
 
 ```
-sudo docker run -d --net=host tobegit3hub/standalone-kafka
+docker run -d --net=host -e HOSTNAME=localhost tobegit3hub/standalone-kafka
 ```
 
 It exposes 2181 for ZooKeeper and 9092 for Kafka. Just connect with them like local processes.
