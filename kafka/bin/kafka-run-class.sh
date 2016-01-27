@@ -22,17 +22,8 @@ fi
 
 base_dir=$(dirname $0)/..
 
-# create logs directory
-if [ "x$LOG_DIR" = "x" ]; then
-    LOG_DIR="$base_dir/logs"
-fi
-
-if [ ! -d "$LOG_DIR" ]; then
-    mkdir -p "$LOG_DIR"
-fi
-
 if [ -z "$SCALA_VERSION" ]; then
-	SCALA_VERSION=2.10.4
+	SCALA_VERSION=2.10.5
 fi
 
 if [ -z "$SCALA_BINARY_VERSION" ]; then
@@ -40,9 +31,10 @@ if [ -z "$SCALA_BINARY_VERSION" ]; then
 fi
 
 # run ./gradlew copyDependantLibs to get all dependant jars in a local dir
-for file in $base_dir/core/build/dependant-libs-${SCALA_VERSION}*/*.jar;
+shopt -s nullglob
+for dir in $base_dir/core/build/dependant-libs-${SCALA_VERSION}*;
 do
-  CLASSPATH=$CLASSPATH:$file
+  CLASSPATH=$CLASSPATH:$dir/*
 done
 
 for file in $base_dir/examples/build/libs//kafka-examples*.jar;
@@ -65,16 +57,35 @@ do
   CLASSPATH=$CLASSPATH:$file
 done
 
-# classpath addition for release
-for file in $base_dir/libs/*.jar;
+for file in $base_dir/tools/build/libs/kafka-tools*.jar;
 do
   CLASSPATH=$CLASSPATH:$file
 done
+
+for dir in $base_dir/tools/build/dependant-libs-${SCALA_VERSION}*;
+do
+  CLASSPATH=$CLASSPATH:$dir/*
+done
+
+for cc_pkg in "api" "runtime" "file" "json"
+do
+  for file in $base_dir/connect/${cc_pkg}/build/libs/connect-${cc_pkg}*.jar;
+  do
+    CLASSPATH=$CLASSPATH:$file
+  done
+  if [ -d "$base_dir/connect/${cc_pkg}/build/dependant-libs" ] ; then
+    CLASSPATH=$CLASSPATH:$base_dir/connect/${cc_pkg}/build/dependant-libs/*
+  fi
+done
+
+# classpath addition for release
+CLASSPATH=$CLASSPATH:$base_dir/libs/*
 
 for file in $base_dir/core/build/libs/kafka_${SCALA_BINARY_VERSION}*.jar;
 do
   CLASSPATH=$CLASSPATH:$file
 done
+shopt -u nullglob
 
 # JMX settings
 if [ -z "$KAFKA_JMX_OPTS" ]; then
@@ -86,9 +97,20 @@ if [  $JMX_PORT ]; then
   KAFKA_JMX_OPTS="$KAFKA_JMX_OPTS -Dcom.sun.management.jmxremote.port=$JMX_PORT "
 fi
 
+# Log directory to use
+if [ "x$LOG_DIR" = "x" ]; then
+    LOG_DIR="$base_dir/logs"
+fi
+
 # Log4j settings
 if [ -z "$KAFKA_LOG4J_OPTS" ]; then
+  # Log to console. This is a tool.
   KAFKA_LOG4J_OPTS="-Dlog4j.configuration=file:$base_dir/config/tools-log4j.properties"
+else
+  # create logs directory
+  if [ ! -d "$LOG_DIR" ]; then
+    mkdir -p "$LOG_DIR"
+  fi
 fi
 
 KAFKA_LOG4J_OPTS="-Dkafka.logs.dir=$LOG_DIR $KAFKA_LOG4J_OPTS"
@@ -112,7 +134,7 @@ fi
 
 # JVM performance options
 if [ -z "$KAFKA_JVM_PERFORMANCE_OPTS" ]; then
-  KAFKA_JVM_PERFORMANCE_OPTS="-server -XX:+UseParNewGC -XX:+UseConcMarkSweepGC -XX:+CMSClassUnloadingEnabled -XX:+CMSScavengeBeforeRemark -XX:+DisableExplicitGC -Djava.awt.headless=true"
+  KAFKA_JVM_PERFORMANCE_OPTS="-server -XX:+UseG1GC -XX:MaxGCPauseMillis=20 -XX:InitiatingHeapOccupancyPercent=35 -XX:+DisableExplicitGC -Djava.awt.headless=true"
 fi
 
 
@@ -125,7 +147,7 @@ while [ $# -gt 0 ]; do
       shift 2
       ;;
     -loggc)
-      if [ -z "$KAFKA_GC_LOG_OPTS"] ; then
+      if [ -z "$KAFKA_GC_LOG_OPTS" ]; then
         GC_LOG_ENABLED="true"
       fi
       shift
