@@ -2,9 +2,11 @@
 
 ## Introduction
 
-We run kafka(0.8.2) in container and make it super easy to develop, test and benchmark.
+We run kafka (0.9.0.0) in container and make it super easy to develop, test and benchmark.
 
 It's painless and everyone can setup kafka environment within seconds!
+
+We fixed the advertised host name in default config so that it will work with docker-machine too.
 
 ![](kafka_docker.png)
 
@@ -15,6 +17,16 @@ docker run -d --net=host -e HOSTNAME=localhost tobegit3hub/standalone-kafka
 ```
 
 It exposes 2181 for ZooKeeper and 9092 for Kafka. Just connect with them like local processes.
+
+If you use `docker-machine` (for example on OS X) you can still use localhost binding by running the following command:
+
+```
+docker-machine ssh default -f -N -L 9092:localhost:9092 -L 2181:localhost:2181
+```
+
+Change `default` if you are using an alternate machine.
+
+**Note:** you need a recent version of docker-machine for this to work. Known to work on 0.5.6.
 
 ## Tutorial
 
