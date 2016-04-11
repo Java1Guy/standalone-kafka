@@ -8,7 +8,9 @@ It's painless and everyone can setup kafka environment within seconds!
 
 We fixed the advertised host name in default config so that it will work with docker-machine too.
 
-![](kafka_docker.png)
+We also enable topic deletion as it makes things simpler for testing and experimenting.
+
+![](im_kafka_docker.png)
 
 ## Usage
 
