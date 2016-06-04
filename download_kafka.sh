@@ -6,10 +6,8 @@ rm kafka_*.tgz
 rm -rf kafka
 mv kafka_* kafka
 
-# Replace advertised hostname with localhost in server config
-cat kafka/config/server.properties \
-    | sed 's/#advertised.host.name=<hostname routable by clients>/advertised.host.name=localhost/' \
-    > kafka/config/server-localhost.properties
+# Replace advertised hostname with loopback ip in server config
+sed -ir "s/^.*\(advertised.host.name\)=\(.*\)/\1=localhost/g" kafka/config/server.properties
 
 # Also turn on topic deletion as it makes testing easier
-echo -e "\n# Enable topic deletions\ndelete.topic.enable = true" >> kafka/config/server-localhost.properties
+echo -e "\n# Enable topic deletions\ndelete.topic.enable = true" >> kafka/config/server.properties
