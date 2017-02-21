@@ -2,7 +2,7 @@
 
 ## Introduction
 
-We run kafka (0.9.0.1) in a container and make it super easy to develop, test and benchmark.
+We run kafka (0.10.1.1) in a container and make it super easy to develop, test and benchmark.
 
 It's painless, and everyone can setup a kafka environment within seconds!
 
@@ -11,6 +11,14 @@ We also enable topic deletion as it makes things simpler for testing and experim
 ![](im_kafka_docker.png)
 
 ## Usage
+
+Download the Kafka 0.10.1.1 distribution:
+
+```
+./download_kafka.sh
+```
+
+Then you can start the docker container:
 
 ```
 docker run -d -p 2181:2181 -p 9092:9092 deviantart/standalone-kafka
